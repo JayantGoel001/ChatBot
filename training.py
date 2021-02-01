@@ -16,5 +16,34 @@ intents = {}
 with open("intents.json", "r+") as f:
     intents = json.loads(f.read())
 
+words = []
+classes = []
+documents = []
+ignore_letters = ['?', '!', '.', ',']
 
+for intent in intents['intents']:
+    for pattern in intent['patterns']:
+        word_list = nltk.tokenize.word_tokenize(pattern)
+        words.extend(word_list)
+        documents.append((word_list, intent['tag']))
+        if intent['tag'] not in classes:
+            classes.append(intent['tag'])
 
+words = [lemmatizer.lemmatize(word) for word in words if word not in ignore_letters]
+words = sorted(set(words))
+
+classes = sorted(set(classes))
+
+with open("words.pkl", 'wb') as f:
+    pickle.dump(words, f)
+
+with open("classes.pkl", 'wb') as f:
+    pickle.dump(classes, f)
+
+training = []
+output = [0] * len(classes)
+
+for document in documents:
+    bag = []
+    word_patterns = document[0]
+    word_patterns = [lemmatizer.lemmatize(word.lower()) for word in word_patterns]
