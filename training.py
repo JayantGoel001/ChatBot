@@ -47,3 +47,5 @@ for document in documents:
     bag = []
     word_patterns = document[0]
     word_patterns = [lemmatizer.lemmatize(word.lower()) for word in word_patterns]
+    for word in words:
+        bag.append(word) if word in word_patterns else bag.append(0)
