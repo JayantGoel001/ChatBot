@@ -15,14 +15,14 @@ with open("intents.json", "r+") as f:
     intents = json.loads(f.read())
 
 words = []
-with open("words.pkl", 'r+') as f:
+with open("words.pkl", 'rb') as f:
     words = pkl.load(f)
 
 classes = []
-with open("classes.pkl", 'r+') as f:
+with open("classes.pkl", 'rb') as f:
     classes = pkl.load(f)
 
-model = load_model("chatbot")
+model = load_model("chatbot.h5")
 
 
 def clean_up_sentence(sentence):
@@ -42,9 +42,9 @@ def bag_of_words(sentence):
     return np.array(bag)
 
 
-def predict(sentence):
+def predict_class(sentence):
     bag = bag_of_words(sentence)
-    res = model.predict(np.array(bag))[0]
+    res = model.predict(np.array([bag]))[0]
     ERROR_THRESHOLD = 0.25
     result = [[i, r] for i, r in enumerate(res) if r > ERROR_THRESHOLD]
     result.sort(key=lambda x: x[1], reverse=True)
@@ -61,7 +61,7 @@ def get_response(intents_list, intents_json):
     list_of_intents = intents_json['intents']
     for i in list_of_intents:
         if i['tag'] == tag:
-            result = random.choice(i['response'])
+            result = random.choice(i['responses'])
             break
     return result
 
@@ -70,6 +70,6 @@ print("Let's Rock")
 
 while True:
     message = input("")
-    predicted_class = predict(message)
-    res = get_response(predicted_class,intents)
+    predicted_class = predict_class(message)
+    res = get_response(predicted_class, intents)
     print(res)
