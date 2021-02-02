@@ -50,3 +50,8 @@ def predict(sentence):
     result.sort(key=lambda x: x[1], reverse=True)
 
     result_list = []
+    for r in result:
+        result_list.append({'intent': classes[r[0]], 'probability': str(r[1])})
+
+    return result_list
+
